@@ -10,12 +10,14 @@ if [ $? -ne 0 ];then
 	echo "the network is have a trouble,pls check!!!"
 	exit 1
 else
-	test ! -d /application && mkdir /application && cd /application
-	wget https://github.com/afeichen/work_file/raw/master/hiredis-0.10.1-3.el6.x86_64.rpm
-	wget https://github.com/afeichen/work_file/blob/master/redis-2.8.19.tar.gz
-	wget https://github.com/afeichen/work_file/blob/master/redis.conf
-	wget https://github.com/afeichen/work_file/blob/master/sd_pro.tgz
-	wget https://github.com/afeichen/work_file/blob/master/sd_script.tgz
+	test ! -d /application && mkdir /application
+	cd /application
+	wget https://raw.githubusercontent.com/afeichen/work_file/master/sd_script.tgz
+	wget https://raw.githubusercontent.com/afeichen/work_file/master/hiredis-0.10.1-3.el6.x86_64.rpm
+	wget https://raw.githubusercontent.com/afeichen/work_file/master/redis-2.8.19.tar.gz
+	wget https://raw.githubusercontent.com/afeichen/work_file/master/redis.conf
+	wget https://raw.githubusercontent.com/afeichen/work_file/master/sd_pro.tgz
+	wget https://raw.githubusercontent.com/afeichen/work_file/master/sd_script.tgz
 fi
 
 df -h
@@ -31,10 +33,11 @@ sd_mkdir
 
 sd_xf_tgz() {
 	cd /application
-	cp sd_pro.tgz /opt/cap/tcpreassembly && tar xf sd_pro.tgz
-	cp sd_script.tgz $data_dir/script && tar xf sd_script.tgz
-	cp redis.conf /etc
+	tar xf sd_pro.tgz -C /opt/cap/tcpreassembly
+	tar xf sd_script.tgz -C $data_dir/script
+	cp redis.conf /etc/
 	tar xf redis-2.8.19.tar.gz
+	rpm -ivh hiredis-0.10.1-3.el6.x86_64.rpm
 }
 
 sd_xf_tgz
@@ -45,10 +48,6 @@ sd_install() {
 	cp src/* /usr/sbin/
 	mkdir /redis
 	redis-server /etc/redis.conf
-	    if [ `ps auxf| grep 'redis-server'| grep -v grep| wc -l` -ne 0 ];then
-	    cd /application && rpm -ivh hiredis-0.10.1-3.el6.x86_64.rpm
-	    sh /opt/cap/tcpreassembly/start.sh
-	    fi
 	fi 
 }
 
@@ -75,6 +74,8 @@ sd_sed
 sd_check() {
 	if [ `ps auxf| grep 'conf/dc'| grep -v grep| wc -l` -ne 0 ];then
 	echo "sd is install successful"
+	else
+	echo "sd is install faild"
 	fi
 }
 sd_check
